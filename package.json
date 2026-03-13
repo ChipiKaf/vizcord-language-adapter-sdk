@@ -1,0 +1,20 @@
+{
+  "name": "@vizcord/language-adapter-sdk",
+  "version": "0.1.0",
+  "description": "Open SDK for vizcord language adapters — canonical IR definitions, adapter contract, and trace link model",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rm -rf dist *.tsbuildinfo",
+    "test": "vitest run",
+    "lint": "eslint src/"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0",
+    "eslint": "^9.0.0"
+  }
+}
