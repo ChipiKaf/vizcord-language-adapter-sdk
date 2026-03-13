@@ -2,7 +2,10 @@
 // SDK Utilities – helpers for adapter authors
 // ---------------------------------------------------------------------------
 
-import type { CanonicalNodeBase, SourceRange } from "../canonical/structural.js";
+import type {
+  CanonicalNodeBase,
+  SourceRange,
+} from "../canonical/structural.js";
 import type { TraceLink } from "../trace-links/index.js";
 
 let _counter = 0;
@@ -25,7 +28,11 @@ export function makeTraceLinkId(): string {
 }
 
 /** Generate a unique edge ID */
-export function makeEdgeId(sourceId: string, targetId: string, kind: string): string {
+export function makeEdgeId(
+  sourceId: string,
+  targetId: string,
+  kind: string,
+): string {
   return `${kind}:${sourceId}->${targetId}`;
 }
 

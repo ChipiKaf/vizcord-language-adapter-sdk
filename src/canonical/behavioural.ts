@@ -2,7 +2,11 @@
 // Canonical IR – Behavioural Sub-model (CPG inspired)
 // ---------------------------------------------------------------------------
 
-import type { SourceRange, CanonicalNodeBase, CanonicalEdge } from "./structural.js";
+import type {
+  SourceRange,
+  CanonicalNodeBase,
+  CanonicalEdge,
+} from "./structural.js";
 
 // ---- Behavioural node types -----------------------------------------------
 
