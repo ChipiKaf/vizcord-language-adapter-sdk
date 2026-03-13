@@ -2,37 +2,164 @@
 // Adapter Contract – the interface every language adapter must implement
 // ---------------------------------------------------------------------------
 
-import type { CanonicalGraph, CanonicalDelta } from "../canonical/index.js";
+import type {
+  CanonicalGraph,
+  CanonicalDelta,
+  CanonicalId,
+} from "../canonical/index.js";
 import type { TraceLink } from "../trace-links/index.js";
 import type { AdapterInfo } from "./capability.js";
+import type { Visibility } from "../canonical/structural.js";
 
 /** A text edit to apply to a source file */
 export interface SourceEdit {
-  file: string;
-  startLine: number;
-  startColumn: number;
-  endLine: number;
-  endColumn: number;
-  newText: string;
+  readonly file: string;
+  readonly startLine: number;
+  readonly startColumn: number;
+  readonly endLine: number;
+  readonly endColumn: number;
+  readonly newText: string;
 }
 
-/** A canonical-level edit operation (e.g. rename, add parameter) */
-export interface CanonicalEdit {
-  type:
-    | "rename"
-    | "addParameter"
-    | "removeParameter"
-    | "addMethod"
-    | "removeMethod"
-    | "addField"
-    | "removeField"
-    | "addClass"
-    | "addImport"
-    | "changeType"
-    | "moveNode";
-  targetId: string;
-  payload: Record<string, unknown>;
+// ---- Discriminated canonical edit operations ------------------------------
+
+export interface RenameEdit {
+  readonly type: "rename";
+  readonly targetId: CanonicalId;
+  readonly newName: string;
 }
+
+export interface AddParameterEdit {
+  readonly type: "addParameter";
+  readonly targetId: CanonicalId;
+  readonly parameterName: string;
+  readonly parameterType?: string;
+  readonly position?: number;
+}
+
+export interface RemoveParameterEdit {
+  readonly type: "removeParameter";
+  readonly targetId: CanonicalId;
+  readonly parameterName: string;
+}
+
+export interface AddMethodEdit {
+  readonly type: "addMethod";
+  readonly targetId: CanonicalId;
+  readonly methodName: string;
+  readonly returnType?: string;
+  readonly visibility?: Visibility;
+}
+
+export interface RemoveMethodEdit {
+  readonly type: "removeMethod";
+  readonly targetId: CanonicalId;
+}
+
+export interface AddFieldEdit {
+  readonly type: "addField";
+  readonly targetId: CanonicalId;
+  readonly fieldName: string;
+  readonly fieldType?: string;
+  readonly visibility?: Visibility;
+}
+
+export interface RemoveFieldEdit {
+  readonly type: "removeField";
+  readonly targetId: CanonicalId;
+}
+
+export interface AddClassEdit {
+  readonly type: "addClass";
+  readonly targetId: CanonicalId;
+  readonly className: string;
+  readonly parentModuleId?: CanonicalId;
+}
+
+export interface AddImportEdit {
+  readonly type: "addImport";
+  readonly targetId: CanonicalId;
+  readonly importPath: string;
+  readonly importName: string;
+}
+
+export interface ChangeTypeEdit {
+  readonly type: "changeType";
+  readonly targetId: CanonicalId;
+  readonly newType: string;
+}
+
+export interface MoveNodeEdit {
+  readonly type: "moveNode";
+  readonly targetId: CanonicalId;
+  readonly newParentId: CanonicalId;
+}
+
+/** Discriminated union of all edit operations */
+export type CanonicalEdit =
+  | RenameEdit
+  | AddParameterEdit
+  | RemoveParameterEdit
+  | AddMethodEdit
+  | RemoveMethodEdit
+  | AddFieldEdit
+  | RemoveFieldEdit
+  | AddClassEdit
+  | AddImportEdit
+  | ChangeTypeEdit
+  | MoveNodeEdit;
+
+export type CanonicalEditType = CanonicalEdit["type"];
+
+// ---- Adapter diagnostic ---------------------------------------------------
+
+export interface AdapterDiagnostic {
+  readonly severity: "error" | "warning" | "info";
+  readonly message: string;
+  readonly file?: string;
+  readonly line?: number;
+  readonly column?: number;
+}
+
+// ---- Result types (discriminated, not boolean flags) ----------------------
+
+export interface ParseResult {
+  readonly graph: CanonicalGraph;
+  readonly traceLinks: readonly TraceLink[];
+  readonly diagnostics: readonly AdapterDiagnostic[];
+}
+
+export interface DiffResult {
+  readonly delta: CanonicalDelta;
+  readonly traceLinks: readonly TraceLink[];
+  readonly diagnostics: readonly AdapterDiagnostic[];
+}
+
+/** Structured error for failed edit operations */
+export type EditFailureReason =
+  | { readonly kind: "unsupportedCapability"; readonly capability: string }
+  | { readonly kind: "staleMapping"; readonly targetId: CanonicalId }
+  | {
+      readonly kind: "ambiguousTarget";
+      readonly targetId: CanonicalId;
+      readonly candidates: readonly CanonicalId[];
+    }
+  | { readonly kind: "invalidSemanticState"; readonly detail: string }
+  | { readonly kind: "patchConflict"; readonly detail: string };
+
+export type ApplyEditResult =
+  | {
+      readonly kind: "success";
+      readonly edits: readonly SourceEdit[];
+      readonly diagnostics: readonly AdapterDiagnostic[];
+    }
+  | {
+      readonly kind: "failure";
+      readonly reason: EditFailureReason;
+      readonly diagnostics: readonly AdapterDiagnostic[];
+    };
+
+// ---- Adapter contract -----------------------------------------------------
 
 /**
  * The contract every language adapter must implement.
@@ -67,38 +194,11 @@ export interface LanguageAdapter {
   /**
    * Return all trace links produced during the last parse/extract.
    */
-  trace(): TraceLink[];
+  trace(): readonly TraceLink[];
 
   /**
    * Apply a canonical edit back to the source code.
    * Only available if the adapter declares `ReverseEditing` capability.
-   * @returns Source edits to apply, or an error description
    */
   applyEdit(edit: CanonicalEdit): Promise<ApplyEditResult>;
-}
-
-export interface ParseResult {
-  graph: CanonicalGraph;
-  traceLinks: TraceLink[];
-  diagnostics: AdapterDiagnostic[];
-}
-
-export interface DiffResult {
-  delta: CanonicalDelta;
-  traceLinks: TraceLink[];
-  diagnostics: AdapterDiagnostic[];
-}
-
-export interface ApplyEditResult {
-  success: boolean;
-  edits: SourceEdit[];
-  diagnostics: AdapterDiagnostic[];
-}
-
-export interface AdapterDiagnostic {
-  severity: "error" | "warning" | "info";
-  message: string;
-  file?: string;
-  line?: number;
-  column?: number;
 }

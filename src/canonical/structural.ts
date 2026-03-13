@@ -2,90 +2,110 @@
 // Canonical IR – Structural Sub-model (FAMIX / KDM inspired)
 // ---------------------------------------------------------------------------
 
+import type { CanonicalId, EdgeId } from "./brand.js";
+
 /** Source location within a file */
 export interface SourceRange {
-  file: string;
-  startLine: number;
-  startColumn: number;
-  endLine: number;
-  endColumn: number;
+  readonly file: string;
+  readonly startLine: number;
+  readonly startColumn: number;
+  readonly endLine: number;
+  readonly endColumn: number;
+}
+
+/** Provenance: where a canonical entity came from (separate from identity) */
+export interface SourceOrigin {
+  readonly language: string;
+  readonly file: string;
+  readonly range: SourceRange;
+  readonly astNodeKind?: string;
+  readonly nativeId?: string;
+}
+
+/**
+ * Namespaced extension data for language-specific metadata.
+ * Each namespace isolates one adapter's extras from the core model.
+ */
+export interface ExtensionData {
+  readonly namespace: string;
+  readonly data: Readonly<Record<string, unknown>>;
 }
 
 /** Every canonical node carries a stable identifier and provenance. */
 export interface CanonicalNodeBase {
-  /** Stable, language-agnostic ID (e.g. "pkg:module:ClassName") */
-  id: string;
+  /** Stable, language-agnostic ID */
+  readonly id: CanonicalId;
   /** Human-readable name */
-  name: string;
+  readonly name: string;
   /** Language the node was extracted from */
-  language: string;
-  /** Original source location */
-  sourceRange?: SourceRange;
-  /** Arbitrary metadata */
-  metadata?: Record<string, unknown>;
+  readonly language: string;
+  /** Provenance: source origin(s) for this entity */
+  readonly sourceOrigins?: readonly SourceOrigin[];
+  /** Language-specific extension data, namespaced per adapter */
+  readonly extensions?: readonly ExtensionData[];
 }
 
 // ---- Structural node types ------------------------------------------------
 
 export interface PackageNode extends CanonicalNodeBase {
-  kind: "package";
+  readonly kind: "package";
 }
 
 export interface ModuleNode extends CanonicalNodeBase {
-  kind: "module";
+  readonly kind: "module";
   /** Enclosing package id */
-  packageId?: string;
+  readonly packageId?: CanonicalId;
 }
 
 export interface ClassNode extends CanonicalNodeBase {
-  kind: "class";
+  readonly kind: "class";
   /** Module or package that contains this class */
-  parentId?: string;
-  isAbstract?: boolean;
-  typeParameters?: string[];
+  readonly parentId?: CanonicalId;
+  readonly isAbstract?: boolean;
+  readonly typeParameters?: readonly string[];
 }
 
 export interface InterfaceNode extends CanonicalNodeBase {
-  kind: "interface";
-  parentId?: string;
-  typeParameters?: string[];
+  readonly kind: "interface";
+  readonly parentId?: CanonicalId;
+  readonly typeParameters?: readonly string[];
 }
 
 export interface FunctionNode extends CanonicalNodeBase {
-  kind: "function";
-  parentId?: string;
-  parameters: ParameterInfo[];
-  returnType?: string;
-  isAsync?: boolean;
-  isStatic?: boolean;
-  visibility?: Visibility;
+  readonly kind: "function";
+  readonly parentId?: CanonicalId;
+  readonly parameters: readonly ParameterInfo[];
+  readonly returnType?: string;
+  readonly isAsync?: boolean;
+  readonly isStatic?: boolean;
+  readonly visibility?: Visibility;
 }
 
 export interface FieldNode extends CanonicalNodeBase {
-  kind: "field";
-  parentId: string;
-  type?: string;
-  isStatic?: boolean;
-  visibility?: Visibility;
+  readonly kind: "field";
+  readonly parentId: CanonicalId;
+  readonly type?: string;
+  readonly isStatic?: boolean;
+  readonly visibility?: Visibility;
 }
 
 export interface VariableNode extends CanonicalNodeBase {
-  kind: "variable";
-  parentId?: string;
-  type?: string;
-  isConst?: boolean;
+  readonly kind: "variable";
+  readonly parentId?: CanonicalId;
+  readonly type?: string;
+  readonly isConst?: boolean;
 }
 
 export interface EnumNode extends CanonicalNodeBase {
-  kind: "enum";
-  parentId?: string;
-  members: string[];
+  readonly kind: "enum";
+  readonly parentId?: CanonicalId;
+  readonly members: readonly string[];
 }
 
 export interface TypeAliasNode extends CanonicalNodeBase {
-  kind: "typeAlias";
-  parentId?: string;
-  aliasedType: string;
+  readonly kind: "typeAlias";
+  readonly parentId?: CanonicalId;
+  readonly aliasedType: string;
 }
 
 // ---- Supporting types -----------------------------------------------------
@@ -93,10 +113,10 @@ export interface TypeAliasNode extends CanonicalNodeBase {
 export type Visibility = "public" | "protected" | "private";
 
 export interface ParameterInfo {
-  name: string;
-  type?: string;
-  isOptional?: boolean;
-  defaultValue?: string;
+  readonly name: string;
+  readonly type?: string;
+  readonly isOptional?: boolean;
+  readonly defaultValue?: string;
 }
 
 // ---- Union of all structural nodes ----------------------------------------
@@ -117,38 +137,37 @@ export type StructuralNodeKind = StructuralNode["kind"];
 // ---- Structural edge types ------------------------------------------------
 
 export interface CanonicalEdge {
-  id: string;
-  sourceId: string;
-  targetId: string;
-  metadata?: Record<string, unknown>;
+  readonly id: EdgeId;
+  readonly sourceId: CanonicalId;
+  readonly targetId: CanonicalId;
 }
 
 export interface ContainmentEdge extends CanonicalEdge {
-  kind: "containment";
+  readonly kind: "containment";
 }
 
 export interface InheritanceEdge extends CanonicalEdge {
-  kind: "inheritance";
+  readonly kind: "inheritance";
 }
 
 export interface ImplementsEdge extends CanonicalEdge {
-  kind: "implements";
+  readonly kind: "implements";
 }
 
 export interface ImportEdge extends CanonicalEdge {
-  kind: "import";
+  readonly kind: "import";
 }
 
 export interface InvocationEdge extends CanonicalEdge {
-  kind: "invocation";
+  readonly kind: "invocation";
 }
 
 export interface AccessEdge extends CanonicalEdge {
-  kind: "access";
+  readonly kind: "access";
 }
 
 export interface DependencyEdge extends CanonicalEdge {
-  kind: "dependency";
+  readonly kind: "dependency";
 }
 
 export type StructuralEdge =

@@ -3,55 +3,57 @@
 // ---------------------------------------------------------------------------
 
 import type { SourceRange } from "../canonical/structural.js";
+import type {
+  CanonicalId,
+  TraceLinkId,
+  ViewNodeId,
+} from "../canonical/brand.js";
+
+/** Discriminated link kinds for explicit correspondence types */
+export type TraceLinkKind = "source" | "view";
 
 /**
- * A trace link records the provenance of a canonical node: which source
- * file, range, and AST construct it was derived from. View-layer links
- * connect canonical nodes to their visual representations.
+ * A source-layer trace link: connects a canonical node to its origin
+ * in a source file (AST node, location, parser identity).
  */
-export interface TraceLink {
-  id: string;
-
-  /** The canonical node this link refers to */
-  canonicalId: string;
-
-  /** Which layer this link connects */
-  layer: "source" | "view";
-
-  /** Language identifier (e.g. "typescript", "python") */
-  language?: string;
-
-  /** Source file path */
-  file?: string;
-
-  /** Source range in the original file */
-  range?: SourceRange;
-
-  /** AST node kind from the parser (e.g. "ClassDeclaration") */
-  astNodeKind?: string;
-
+export interface SourceTraceLink {
+  readonly id: TraceLinkId;
+  readonly canonicalId: CanonicalId;
+  readonly layer: "source";
+  readonly language: string;
+  readonly file: string;
+  readonly range: SourceRange;
+  readonly astNodeKind: string;
   /** Language-native ID (e.g. TS symbol id) */
-  nativeId?: string;
-
-  /** View node ID when layer === "view" */
-  viewNodeId?: string;
-
-  /** View type (e.g. "structural", "dependency", "behavioural") */
-  viewType?: string;
+  readonly nativeId?: string;
 }
+
+/**
+ * A view-layer trace link: connects a canonical node to a view element.
+ */
+export interface ViewTraceLink {
+  readonly id: TraceLinkId;
+  readonly canonicalId: CanonicalId;
+  readonly layer: "view";
+  readonly viewNodeId: ViewNodeId;
+  /** View type (e.g. "structural", "dependency", "behavioural") */
+  readonly viewType: string;
+}
+
+/** Discriminated union of all trace link types */
+export type TraceLink = SourceTraceLink | ViewTraceLink;
 
 /** Query helpers for trace link lookups */
 export interface TraceLinkIndex {
-  byCanonicalId(id: string): TraceLink[];
-  byFile(file: string): TraceLink[];
-  byViewNodeId(viewNodeId: string): TraceLink | undefined;
-  bySourceRange(file: string, line: number, column: number): TraceLink[];
+  byCanonicalId(id: CanonicalId): TraceLink[];
+  byFile(file: string): SourceTraceLink[];
+  byViewNodeId(viewNodeId: ViewNodeId): ViewTraceLink | undefined;
+  bySourceRange(file: string, line: number, column: number): SourceTraceLink[];
 }
 
 /** A mutable store of trace links */
 export interface TraceLinkStore extends TraceLinkIndex {
   add(link: TraceLink): void;
-  remove(id: string): void;
-  update(id: string, patch: Partial<TraceLink>): void;
+  remove(id: TraceLinkId): void;
   all(): TraceLink[];
 }

@@ -2,6 +2,7 @@
 // Canonical IR – Behavioural Sub-model (CPG inspired)
 // ---------------------------------------------------------------------------
 
+import type { CanonicalId } from "./brand.js";
 import type {
   SourceRange,
   CanonicalNodeBase,
@@ -11,20 +12,20 @@ import type {
 // ---- Behavioural node types -----------------------------------------------
 
 export interface CfgBlockNode extends CanonicalNodeBase {
-  kind: "cfgBlock";
+  readonly kind: "cfgBlock";
   /** ID of the owning function */
-  functionId: string;
+  readonly functionId: CanonicalId;
   /** Is this the entry or exit block? */
-  blockType?: "entry" | "exit" | "normal" | "branch" | "loop";
+  readonly blockType?: "entry" | "exit" | "normal" | "branch" | "loop";
 }
 
 export interface ExpressionNode extends CanonicalNodeBase {
-  kind: "expression";
+  readonly kind: "expression";
   /** ID of the owning CFG block */
-  blockId: string;
-  expressionType?: string;
+  readonly blockId: CanonicalId;
+  readonly expressionType?: string;
   /** Source text snippet for display */
-  snippet?: string;
+  readonly snippet?: string;
 }
 
 export type BehaviouralNode = CfgBlockNode | ExpressionNode;
@@ -34,15 +35,15 @@ export type BehaviouralNodeKind = BehaviouralNode["kind"];
 // ---- Behavioural edge types -----------------------------------------------
 
 export interface ControlFlowEdge extends CanonicalEdge {
-  kind: "controlFlow";
+  readonly kind: "controlFlow";
   /** Label for conditional branches */
-  label?: string;
+  readonly label?: string;
 }
 
 export interface DataFlowEdge extends CanonicalEdge {
-  kind: "dataFlow";
+  readonly kind: "dataFlow";
   /** Name of the variable flowing between nodes */
-  variable?: string;
+  readonly variable?: string;
 }
 
 export type BehaviouralEdge = ControlFlowEdge | DataFlowEdge;

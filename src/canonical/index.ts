@@ -24,18 +24,19 @@ export type CanonicalEdgeKind = StructuralEdgeKind | BehaviouralEdgeKind;
 
 /** The full canonical graph produced by a language adapter. */
 export interface CanonicalGraph {
-  nodes: CanonicalNode[];
-  edges: CanonicalEdgeType[];
+  readonly nodes: readonly CanonicalNode[];
+  readonly edges: readonly CanonicalEdgeType[];
 }
 
 /** A delta describing incremental changes to the canonical graph. */
 export interface CanonicalDelta {
-  addedNodes: CanonicalNode[];
-  removedNodeIds: string[];
-  updatedNodes: CanonicalNode[];
-  addedEdges: CanonicalEdgeType[];
-  removedEdgeIds: string[];
+  readonly addedNodes: readonly CanonicalNode[];
+  readonly removedNodeIds: readonly string[];
+  readonly updatedNodes: readonly CanonicalNode[];
+  readonly addedEdges: readonly CanonicalEdgeType[];
+  readonly removedEdgeIds: readonly string[];
 }
 
+export * from "./brand.js";
 export * from "./structural.js";
 export * from "./behavioural.js";

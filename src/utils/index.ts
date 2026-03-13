@@ -5,67 +5,98 @@
 import type {
   CanonicalNodeBase,
   SourceRange,
+  SourceOrigin,
 } from "../canonical/structural.js";
-import type { TraceLink } from "../trace-links/index.js";
+import type {
+  CanonicalId,
+  EdgeId,
+  TraceLinkId,
+  ViewNodeId,
+} from "../canonical/brand.js";
+import type { SourceTraceLink, ViewTraceLink } from "../trace-links/index.js";
 
-let _counter = 0;
+// ---- Branded ID factories -------------------------------------------------
 
 /**
  * Generate a stable, language-agnostic canonical ID.
- * Format: `<language>:<filePath>:<qualifiedName>`
+ * Format: `<entityKind>:<scope>:<qualifiedName>`
  */
 export function makeCanonicalId(
-  language: string,
-  filePath: string,
+  entityKind: string,
+  scope: string,
   qualifiedName: string,
-): string {
-  return `${language}:${filePath}:${qualifiedName}`;
-}
-
-/** Generate a unique trace link ID */
-export function makeTraceLinkId(): string {
-  return `tl_${Date.now()}_${++_counter}`;
-}
-
-/** Generate a unique edge ID */
-export function makeEdgeId(
-  sourceId: string,
-  targetId: string,
-  kind: string,
-): string {
-  return `${kind}:${sourceId}->${targetId}`;
+): CanonicalId {
+  return `${entityKind}:${scope}:${qualifiedName}` as CanonicalId;
 }
 
 /**
- * Create a source-layer trace link from a canonical node.
+ * Generate a deterministic edge ID from its endpoints and kind.
+ */
+export function makeEdgeId(
+  sourceId: CanonicalId,
+  targetId: CanonicalId,
+  kind: string,
+): EdgeId {
+  return `${kind}:${sourceId}->${targetId}` as EdgeId;
+}
+
+/**
+ * Generate a deterministic trace link ID.
+ * Derived from the canonical node and layer so the same link
+ * is reproducible across re-parses.
+ */
+export function makeTraceLinkId(
+  canonicalId: CanonicalId,
+  layer: string,
+  qualifier?: string,
+): TraceLinkId {
+  const suffix = qualifier != null ? `:${qualifier}` : "";
+  return `tl:${canonicalId}:${layer}${suffix}` as TraceLinkId;
+}
+
+/**
+ * Create a view node ID from its canonical counterpart and view type.
+ */
+export function makeViewNodeId(
+  canonicalId: CanonicalId,
+  viewType: string,
+): ViewNodeId {
+  return `${viewType}_${canonicalId}` as ViewNodeId;
+}
+
+// ---- Trace link factories -------------------------------------------------
+
+/**
+ * Create a source-layer trace link from a canonical node and its origin.
  */
 export function createSourceTraceLink(
   node: CanonicalNodeBase,
-  astNodeKind: string,
-  nativeId?: string,
-): TraceLink {
-  return {
-    id: makeTraceLinkId(),
+  origin: SourceOrigin,
+): SourceTraceLink {
+  const base = {
+    id: makeTraceLinkId(node.id, "source", origin.file),
     canonicalId: node.id,
-    layer: "source",
-    language: node.language,
-    file: node.sourceRange?.file,
-    range: node.sourceRange,
-    astNodeKind,
-    nativeId,
+    layer: "source" as const,
+    language: origin.language,
+    file: origin.file,
+    range: origin.range,
+    astNodeKind: origin.astNodeKind ?? "unknown",
   };
+  return origin.nativeId != null
+    ? { ...base, nativeId: origin.nativeId }
+    : base;
 }
 
 /**
  * Create a view-layer trace link.
  */
 export function createViewTraceLink(
-  canonicalId: string,
-  viewNodeId: string,
+  canonicalId: CanonicalId,
+  viewNodeId: ViewNodeId,
   viewType: string,
-): TraceLink {
+): ViewTraceLink {
   return {
-    id: makeTraceLinkId(),
+    id: makeTraceLinkId(canonicalId, "view", viewType),
     canonicalId,
     layer: "view",
     viewNodeId,
@@ -73,8 +104,10 @@ export function createViewTraceLink(
   };
 }
 
+// ---- Range utilities ------------------------------------------------------
+
 /**
- * Utility: check whether a source range contains a position.
+ * Check whether a source range contains a position.
  */
 export function rangeContains(
   range: SourceRange,

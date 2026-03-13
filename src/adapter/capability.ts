@@ -21,15 +21,15 @@ export enum AdapterCapability {
 /** Metadata about a registered adapter */
 export interface AdapterInfo {
   /** Unique adapter identifier (e.g. "typescript", "python") */
-  id: string;
+  readonly id: string;
   /** Human-readable name */
-  displayName: string;
+  readonly displayName: string;
   /** Supported file extensions (e.g. [".ts", ".tsx"]) */
-  fileExtensions: string[];
+  readonly fileExtensions: readonly string[];
   /** Language identifiers (e.g. ["typescript", "typescriptreact"]) */
-  languageIds: string[];
+  readonly languageIds: readonly string[];
   /** Declared capabilities */
-  capabilities: AdapterCapability[];
+  readonly capabilities: readonly AdapterCapability[];
   /** Adapter SDK version this was built against */
-  sdkVersion: string;
+  readonly sdkVersion: string;
 }
