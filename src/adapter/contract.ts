@@ -1,7 +1,3 @@
-// ---------------------------------------------------------------------------
-// Adapter Contract – the interface every language adapter must implement
-// ---------------------------------------------------------------------------
-
 import type {
   CanonicalGraph,
   CanonicalDelta,
@@ -20,8 +16,6 @@ export interface SourceEdit {
   readonly endColumn: number;
   readonly newText: string;
 }
-
-// ---- Discriminated canonical edit operations ------------------------------
 
 export interface RenameEdit {
   readonly type: "rename";
@@ -111,8 +105,6 @@ export type CanonicalEdit =
 
 export type CanonicalEditType = CanonicalEdit["type"];
 
-// ---- Adapter diagnostic ---------------------------------------------------
-
 export interface AdapterDiagnostic {
   readonly severity: "error" | "warning" | "info";
   readonly message: string;
@@ -120,8 +112,6 @@ export interface AdapterDiagnostic {
   readonly line?: number;
   readonly column?: number;
 }
-
-// ---- Result types (discriminated, not boolean flags) ----------------------
 
 export interface ParseResult {
   readonly graph: CanonicalGraph;
@@ -158,8 +148,6 @@ export type ApplyEditResult =
       readonly reason: EditFailureReason;
       readonly diagnostics: readonly AdapterDiagnostic[];
     };
-
-// ---- Adapter contract -----------------------------------------------------
 
 /**
  * The contract every language adapter must implement.

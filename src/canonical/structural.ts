@@ -1,7 +1,3 @@
-// ---------------------------------------------------------------------------
-// Canonical IR – Structural Sub-model (FAMIX / KDM inspired)
-// ---------------------------------------------------------------------------
-
 import type { CanonicalId, EdgeId } from "./brand.js";
 
 /** Source location within a file */
@@ -44,8 +40,6 @@ export interface CanonicalNodeBase {
   /** Language-specific extension data, namespaced per adapter */
   readonly extensions?: readonly ExtensionData[];
 }
-
-// ---- Structural node types ------------------------------------------------
 
 export interface PackageNode extends CanonicalNodeBase {
   readonly kind: "package";
@@ -108,8 +102,6 @@ export interface TypeAliasNode extends CanonicalNodeBase {
   readonly aliasedType: string;
 }
 
-// ---- Supporting types -----------------------------------------------------
-
 export type Visibility = "public" | "protected" | "private";
 
 export interface ParameterInfo {
@@ -118,8 +110,6 @@ export interface ParameterInfo {
   readonly isOptional?: boolean;
   readonly defaultValue?: string;
 }
-
-// ---- Union of all structural nodes ----------------------------------------
 
 export type StructuralNode =
   | PackageNode
@@ -133,8 +123,6 @@ export type StructuralNode =
   | TypeAliasNode;
 
 export type StructuralNodeKind = StructuralNode["kind"];
-
-// ---- Structural edge types ------------------------------------------------
 
 export interface CanonicalEdge {
   readonly id: EdgeId;

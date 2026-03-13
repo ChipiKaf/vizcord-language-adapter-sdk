@@ -1,7 +1,3 @@
-// ---------------------------------------------------------------------------
-// Trace Links – connects AST ↔ Canonical ↔ View nodes
-// ---------------------------------------------------------------------------
-
 import type { SourceRange } from "../canonical/structural.js";
 import type {
   CanonicalId,

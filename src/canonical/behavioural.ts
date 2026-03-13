@@ -1,15 +1,9 @@
-// ---------------------------------------------------------------------------
-// Canonical IR – Behavioural Sub-model (CPG inspired)
-// ---------------------------------------------------------------------------
-
 import type { CanonicalId } from "./brand.js";
 import type {
   SourceRange,
   CanonicalNodeBase,
   CanonicalEdge,
 } from "./structural.js";
-
-// ---- Behavioural node types -----------------------------------------------
 
 export interface CfgBlockNode extends CanonicalNodeBase {
   readonly kind: "cfgBlock";
@@ -32,8 +26,6 @@ export type BehaviouralNode = CfgBlockNode | ExpressionNode;
 
 export type BehaviouralNodeKind = BehaviouralNode["kind"];
 
-// ---- Behavioural edge types -----------------------------------------------
-
 export interface ControlFlowEdge extends CanonicalEdge {
   readonly kind: "controlFlow";
   /** Label for conditional branches */
@@ -50,5 +42,4 @@ export type BehaviouralEdge = ControlFlowEdge | DataFlowEdge;
 
 export type BehaviouralEdgeKind = BehaviouralEdge["kind"];
 
-// Re-export SourceRange for convenience
 export type { SourceRange, CanonicalNodeBase, CanonicalEdge };

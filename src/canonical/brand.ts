@@ -1,13 +1,7 @@
-// ---------------------------------------------------------------------------
-// Branded ID types and schema version
-// ---------------------------------------------------------------------------
-
 declare const __brand: unique symbol;
 
 /** Construct a branded type: a string that cannot be confused with other IDs */
 type Brand<T, B extends string> = T & { readonly [__brand]: B };
-
-// ---- Branded ID types -----------------------------------------------------
 
 /** Stable identifier for a canonical node */
 export type CanonicalId = Brand<string, "CanonicalId">;
@@ -23,8 +17,6 @@ export type ViewNodeId = Brand<string, "ViewNodeId">;
 
 /** Identifier for a view edge */
 export type ViewEdgeId = Brand<string, "ViewEdgeId">;
-
-// ---- Schema versioning ----------------------------------------------------
 
 /**
  * Current version of the canonical IR schema.

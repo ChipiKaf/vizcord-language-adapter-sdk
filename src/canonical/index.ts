@@ -1,7 +1,3 @@
-// ---------------------------------------------------------------------------
-// Canonical Graph – the full model combining structural + behavioural
-// ---------------------------------------------------------------------------
-
 import type {
   StructuralNode,
   StructuralEdge,

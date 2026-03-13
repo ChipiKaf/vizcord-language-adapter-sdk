@@ -1,7 +1,3 @@
-// ---------------------------------------------------------------------------
-// SDK Utilities – helpers for adapter authors
-// ---------------------------------------------------------------------------
-
 import type {
   CanonicalNodeBase,
   SourceRange,
@@ -14,8 +10,6 @@ import type {
   ViewNodeId,
 } from "../canonical/brand.js";
 import type { SourceTraceLink, ViewTraceLink } from "../trace-links/index.js";
-
-// ---- Branded ID factories -------------------------------------------------
 
 /**
  * Generate a stable, language-agnostic canonical ID.
@@ -64,8 +58,6 @@ export function makeViewNodeId(
   return `${viewType}_${canonicalId}` as ViewNodeId;
 }
 
-// ---- Trace link factories -------------------------------------------------
-
 /**
  * Create a source-layer trace link from a canonical node and its origin.
  */
@@ -103,8 +95,6 @@ export function createViewTraceLink(
     viewType,
   };
 }
-
-// ---- Range utilities ------------------------------------------------------
 
 /**
  * Check whether a source range contains a position.

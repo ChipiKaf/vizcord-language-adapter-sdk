@@ -1,7 +1,3 @@
-// ---------------------------------------------------------------------------
-// Adapter Capability Model
-// ---------------------------------------------------------------------------
-
 /** Features a language adapter can declare support for. */
 export enum AdapterCapability {
   /** Can extract structural entities (classes, functions, etc.) */
