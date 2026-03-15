@@ -7,6 +7,7 @@ import {
   createSourceTraceLink,
   createViewTraceLink,
   rangeContains,
+  validateTraceLinkCompleteness,
 } from "../utils/index.js";
 import type {
   CanonicalId,
@@ -192,5 +193,68 @@ describe("rangeContains", () => {
   it("returns true for any column on a middle line", () => {
     expect(rangeContains(range, 7, 1)).toBe(true);
     expect(rangeContains(range, 7, 999)).toBe(true);
+  });
+});
+
+describe("validateTraceLinkCompleteness", () => {
+  const origin: SourceOrigin = {
+    language: "typescript",
+    file: "src/foo.ts",
+    range: {
+      file: "src/foo.ts",
+      startLine: 1,
+      startColumn: 1,
+      endLine: 5,
+      endColumn: 2,
+    },
+    astNodeKind: "ClassDeclaration",
+  };
+
+  const nodeA: CanonicalNodeBase = {
+    id: cid("class:a:A"),
+    name: "A",
+    language: "typescript",
+    sourceOrigins: [origin],
+  };
+
+  const nodeB: CanonicalNodeBase = {
+    id: cid("class:a:B"),
+    name: "B",
+    language: "typescript",
+    sourceOrigins: [origin],
+  };
+
+  it("returns no diagnostics when all nodes have source trace links", () => {
+    const links = [
+      createSourceTraceLink(nodeA, origin),
+      createSourceTraceLink(nodeB, origin),
+    ];
+    const diagnostics = validateTraceLinkCompleteness([nodeA, nodeB], links);
+    expect(diagnostics).toHaveLength(0);
+  });
+
+  it("returns warning diagnostic for unlinked nodes", () => {
+    const links = [createSourceTraceLink(nodeA, origin)];
+    const diagnostics = validateTraceLinkCompleteness([nodeA, nodeB], links);
+    expect(diagnostics).toHaveLength(1);
+    expect(diagnostics[0]!.severity).toBe("warning");
+    expect(diagnostics[0]!.code).toBe("partial-extraction");
+    expect(diagnostics[0]!.message).toContain("class:a:B");
+  });
+
+  it("ignores view trace links when checking completeness", () => {
+    const viewLink = createViewTraceLink(
+      nodeA.id,
+      "sv_class:a:A" as ViewNodeId,
+      "structural",
+    );
+    // Only view link for nodeA, no source link → diagnostic for nodeA
+    const diagnostics = validateTraceLinkCompleteness([nodeA], [viewLink]);
+    expect(diagnostics).toHaveLength(1);
+  });
+
+  it("returns empty for empty nodes list", () => {
+    const diagnostics = validateTraceLinkCompleteness([], []);
+    expect(diagnostics).toHaveLength(0);
   });
 });

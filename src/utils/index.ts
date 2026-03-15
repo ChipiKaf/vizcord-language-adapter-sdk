@@ -9,7 +9,12 @@ import type {
   TraceLinkId,
   ViewNodeId,
 } from "../canonical/brand.js";
-import type { SourceTraceLink, ViewTraceLink } from "../trace-links/index.js";
+import type {
+  SourceTraceLink,
+  ViewTraceLink,
+  TraceLink,
+} from "../trace-links/index.js";
+import type { ExtractionDiagnostic } from "../adapter/contract.types.js";
 
 /**
  * Generate a stable, language-agnostic canonical ID.
@@ -108,4 +113,31 @@ export function rangeContains(
   if (line === range.startLine && column < range.startColumn) return false;
   if (line === range.endLine && column > range.endColumn) return false;
   return true;
+}
+
+/**
+ * Validate that every canonical node has at least one source trace link.
+ * Returns warning diagnostics for any unlinked nodes.
+ */
+export function validateTraceLinkCompleteness(
+  nodes: readonly CanonicalNodeBase[],
+  traceLinks: readonly TraceLink[],
+): ExtractionDiagnostic[] {
+  const linkedNodeIds = new Set(
+    traceLinks
+      .filter((tl): tl is SourceTraceLink => tl.layer === "source")
+      .map((tl) => tl.canonicalId),
+  );
+  const diagnostics: ExtractionDiagnostic[] = [];
+  for (const node of nodes) {
+    if (!linkedNodeIds.has(node.id)) {
+      diagnostics.push({
+        severity: "warning",
+        file: (node.sourceOrigins ?? [])[0]?.file ?? "unknown",
+        code: "partial-extraction",
+        message: `Node "${node.name}" (${node.id}) has no source trace link`,
+      });
+    }
+  }
+  return diagnostics;
 }
