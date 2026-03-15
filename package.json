@@ -5,6 +5,16 @@
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./testing": {
+      "types": "./dist/testing/index.d.ts",
+      "default": "./dist/testing/index.js"
+    }
+  },
   "files": [
     "dist"
   ],
@@ -15,8 +25,9 @@
     "lint": "eslint src/"
   },
   "devDependencies": {
+    "@types/node": "^25.5.0",
+    "eslint": "^9.0.0",
     "typescript": "^5.5.0",
-    "vitest": "^2.0.0",
-    "eslint": "^9.0.0"
+    "vitest": "^2.0.0"
   }
 }
