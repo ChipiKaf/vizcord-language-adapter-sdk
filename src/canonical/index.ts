@@ -3,14 +3,14 @@ import type {
   StructuralEdge,
   StructuralNodeKind,
   StructuralEdgeKind,
-} from "./structural.js";
+} from "./structural.types.js";
 
 import type {
   BehaviouralNode,
   BehaviouralEdge,
   BehaviouralNodeKind,
   BehaviouralEdgeKind,
-} from "./behavioural.js";
+} from "./behavioural.types.js";
 
 export type CanonicalNode = StructuralNode | BehaviouralNode;
 export type CanonicalNodeKind = StructuralNodeKind | BehaviouralNodeKind;
@@ -34,5 +34,5 @@ export interface CanonicalDelta {
 }
 
 export * from "./brand.js";
-export * from "./structural.js";
-export * from "./behavioural.js";
+export * from "./structural.types.js";
+export * from "./behavioural.types.js";

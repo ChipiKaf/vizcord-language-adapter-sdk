@@ -2,7 +2,7 @@ import type {
   CanonicalNodeBase,
   SourceRange,
   SourceOrigin,
-} from "../canonical/structural.js";
+} from "../canonical/structural.types.js";
 import type {
   CanonicalId,
   EdgeId,

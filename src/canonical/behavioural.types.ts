@@ -3,7 +3,7 @@ import type {
   SourceRange,
   CanonicalNodeBase,
   CanonicalEdge,
-} from "./structural.js";
+} from "./structural.types.js";
 
 export interface CfgBlockNode extends CanonicalNodeBase {
   readonly kind: "cfgBlock";

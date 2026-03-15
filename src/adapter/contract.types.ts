@@ -5,7 +5,7 @@ import type {
 } from "../canonical/index.js";
 import type { TraceLink } from "../trace-links/index.js";
 import type { AdapterInfo } from "./capability.js";
-import type { Visibility, SourceRange } from "../canonical/structural.js";
+import type { Visibility, SourceRange } from "../canonical/structural.types.js";
 
 /** A text edit to apply to a source file */
 export interface SourceEdit {
