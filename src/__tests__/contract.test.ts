@@ -8,8 +8,13 @@ import type {
   DiffResult,
   NodeCompleteness,
   CanonicalNodeBase,
+  CanonicalId,
   SourceRange,
 } from "../index.js";
+
+function cid(s: string): CanonicalId {
+  return s as CanonicalId;
+}
 
 describe("ExtractionDiagnostic", () => {
   it("accepts all valid diagnostic codes", () => {
@@ -83,7 +88,7 @@ describe("NodeCompleteness", () => {
 
   it("is optional on CanonicalNodeBase", () => {
     const node: CanonicalNodeBase = {
-      id: "class:a:A" as any,
+      id: cid("class:a:A"),
       name: "A",
       language: "typescript",
     };
@@ -93,7 +98,7 @@ describe("NodeCompleteness", () => {
 
   it("can be set on CanonicalNodeBase", () => {
     const node: CanonicalNodeBase = {
-      id: "class:a:A" as any,
+      id: cid("class:a:A"),
       name: "A",
       language: "typescript",
       completeness: "partial",
