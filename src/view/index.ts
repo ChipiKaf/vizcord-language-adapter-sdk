@@ -7,3 +7,9 @@ export type {
   GroupBySpec,
   ViewStyleHints,
 } from "./view-definition.types.js";
+export type {
+  ViewDelta,
+  ViewDeltaAddedNode,
+  ViewDeltaAddedEdge,
+  ViewDeltaNodeUpdate,
+} from "./view-delta.types.js";
