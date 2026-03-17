@@ -18,6 +18,34 @@ export type CanonicalNodeKind = StructuralNodeKind | BehaviouralNodeKind;
 export type CanonicalEdgeType = StructuralEdge | BehaviouralEdge;
 export type CanonicalEdgeKind = StructuralEdgeKind | BehaviouralEdgeKind;
 
+/** Runtime list of all canonical node kinds. */
+export const CANONICAL_NODE_KINDS: readonly CanonicalNodeKind[] = [
+  "package",
+  "module",
+  "class",
+  "interface",
+  "function",
+  "field",
+  "variable",
+  "enum",
+  "typeAlias",
+  "cfgBlock",
+  "expression",
+] as const;
+
+/** Runtime list of all canonical edge kinds. */
+export const CANONICAL_EDGE_KINDS: readonly CanonicalEdgeKind[] = [
+  "containment",
+  "inheritance",
+  "implements",
+  "import",
+  "invocation",
+  "access",
+  "dependency",
+  "controlFlow",
+  "dataFlow",
+] as const;
+
 /** The full canonical graph produced by a language adapter. */
 export interface CanonicalGraph {
   readonly nodes: readonly CanonicalNode[];

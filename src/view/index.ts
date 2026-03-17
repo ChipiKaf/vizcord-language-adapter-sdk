@@ -13,3 +13,13 @@ export type {
   ViewDeltaAddedEdge,
   ViewDeltaNodeUpdate,
 } from "./view-delta.types.js";
+export type {
+  NotationStandard,
+  NodeNotation,
+  EdgeNotation,
+  NodeShape,
+  LineStyle,
+  ArrowHead,
+  ColorRole,
+} from "./notation.types.js";
+export { defaultNotation, validateNotation } from "./notation.js";
