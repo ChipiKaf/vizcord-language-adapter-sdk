@@ -47,6 +47,14 @@ export interface ViewStyleHints {
   readonly nodeSep?: number;
   /** Rank spacing (vertical in TB/BT, horizontal in LR/RL). */
   readonly rankSep?: number;
+  /**
+   * Node kinds that should be visually co-located when they share the same
+   * containment parent. Each layout algorithm interprets co-location
+   * differently (dagre → vertical column, force → cluster, radial → arc).
+   *
+   * Omit or set to empty array to disable grouping.
+   */
+  readonly stackKinds?: readonly string[];
 }
 
 export interface ViewDefinition {
