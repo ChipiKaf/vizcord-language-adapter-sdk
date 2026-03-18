@@ -43,6 +43,10 @@ export interface ViewStyleHints {
   readonly direction?: "TB" | "LR" | "BT" | "RL";
   readonly showEdgeLabels?: boolean;
   readonly collapsible?: boolean;
+  /** Node spacing (horizontal in TB/BT, vertical in LR/RL). */
+  readonly nodeSep?: number;
+  /** Rank spacing (vertical in TB/BT, horizontal in LR/RL). */
+  readonly rankSep?: number;
 }
 
 export interface ViewDefinition {
