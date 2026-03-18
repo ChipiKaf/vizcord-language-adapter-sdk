@@ -1,4 +1,10 @@
-export type { ViewModel, ViewNode, ViewEdge } from "./view-model.types.js";
+export type {
+  ViewModel,
+  ViewNode,
+  ViewEdge,
+  ViewNodeCompartment,
+  CompartmentEntry,
+} from "./view-model.types.js";
 export type { Exporter } from "./exporter.types.js";
 export type {
   ViewDefinition,
@@ -6,6 +12,7 @@ export type {
   NodeFilter,
   GroupBySpec,
   ViewStyleHints,
+  ContainmentDisplay,
 } from "./view-definition.types.js";
 export type {
   ViewDelta,

@@ -6,13 +6,22 @@
  * for the renderer — all as data rather than code.
  */
 
-import type { CanonicalNodeKind, CanonicalEdgeKind } from "../canonical/index.js";
+import type {
+  CanonicalNodeKind,
+  CanonicalEdgeKind,
+} from "../canonical/index.js";
 
 export type LayoutType =
   | "hierarchical"
   | "force-directed"
   | "layered"
   | "radial";
+
+/** How parent-child containment relationships are rendered. */
+export type ContainmentDisplay =
+  | "edges" // Separate nodes connected by containment edges (default)
+  | "nested" // Children spatially nested inside parent bounding box
+  | "compartments"; // UML-style: children grouped into labeled compartments
 
 export interface NodeFilter {
   /** Include only nodes whose property values match */
@@ -56,4 +65,7 @@ export interface ViewDefinition {
 
   /** Visual hints for the webview renderer */
   readonly style?: ViewStyleHints;
+
+  /** How parent-child containment is displayed (default: "edges") */
+  readonly containmentDisplay?: ContainmentDisplay;
 }
