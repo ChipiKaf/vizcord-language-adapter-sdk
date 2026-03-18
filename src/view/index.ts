@@ -30,3 +30,20 @@ export type {
   ColorRole,
 } from "./notation.types.js";
 export { defaultNotation, validateNotation } from "./notation.js";
+export type {
+  ViewConstraint,
+  ViewConstraintViolation,
+  LayoutResult,
+  NodePosition,
+  EdgePath,
+  CorrectiveAction,
+} from "./view-constraints.types.js";
+export {
+  maxVisibleNodes,
+  noNodeOverlap,
+  maxEdgeCrossings,
+  maxNodeDegree,
+  areaCoverage,
+  countEdgeCrossings,
+} from "./view-constraints.js";
+export { ViewValidator } from "./view-validator.js";
