@@ -30,6 +30,8 @@ export interface ViewNode {
   readonly children?: readonly ViewNodeId[];
   /** Named compartments for structured sub-sections (UML-style). */
   readonly compartments?: readonly ViewNodeCompartment[];
+  /** Semantic badges displayed as small overlays (e.g. "async", "private"). */
+  readonly badges?: readonly string[];
 }
 
 export interface ViewEdge {

@@ -55,6 +55,8 @@ export interface ViewStyleHints {
    * Omit or set to empty array to disable grouping.
    */
   readonly stackKinds?: readonly string[];
+  /** Show UML-style stereotype labels (e.g. «interface») on nodes. */
+  readonly showStereotypes?: boolean;
 }
 
 export interface ViewDefinition {
