@@ -19,6 +19,9 @@ export type {
   HubClusterOptions,
   SiblingStackOptions,
   CompactOptions,
+  BundlingOptions,
+  EdgeBundlingOptions,
+  EdgeAggregationOptions,
   PostProcessorEntry,
 } from "./view-definition.types.js";
 export type {

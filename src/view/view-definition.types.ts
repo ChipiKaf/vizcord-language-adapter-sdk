@@ -44,6 +44,22 @@ export interface LayoutPositions {
   readonly nodes: Readonly<
     Record<string, { readonly x: number; readonly y: number }>
   >;
+  /**
+   * Edge routing data produced by edge-oriented post-processors (e.g. edge
+   * bundling).  Keyed by edge ID (`"sourceId->targetId"`).  Node-position
+   * PPs pass this through unchanged; edge PPs populate it.
+   */
+  readonly edgeRouting?: Readonly<
+    Record<
+      string,
+      {
+        readonly waypoints: readonly {
+          readonly x: number;
+          readonly y: number;
+        }[];
+      }
+    >
+  >;
 }
 
 /** Minimal graph description passed to layout post-processors. */
@@ -83,8 +99,15 @@ export interface HubClusterOptions {
   readonly edgeKinds?: readonly string[];
   /** Radius of the ring around the centre node (default 200). */
   readonly radius?: number;
-  /** Gap between hub centre edge and neighbour edge (default 60). */
-  readonly padding?: number;
+  /**
+   * Gap between hub centre edge and neighbour edge (default 60).
+   *
+   * Can be a single number or a tiered record mapping minimum cluster
+   * sizes to padding values.  Example: `{ 1: 60, 6: 160 }` means
+   * clusters with 1–5 neighbours get 60px, clusters with 6+ get 160px.
+   * The highest matching threshold wins.
+   */
+  readonly padding?: number | Readonly<Record<number, number>>;
   /** Placement mode: "cross" for ≤4 neighbours, "ring" for more, "auto" to decide per hub (default "auto"). */
   readonly mode?: "cross" | "ring" | "auto";
 }
@@ -99,6 +122,23 @@ export interface SiblingStackOptions {
 export interface CompactOptions {
   /** Maximum horizontal gap allowed between consecutive nodes (default 60). */
   readonly maxGap?: number;
+}
+
+/** Configuration for hierarchical edge bundling (Holten's algorithm). */
+export interface EdgeBundlingOptions {
+  /** Bundling strength: 0 = straight lines, 1 = fully bundled. Default 0.85 */
+  readonly strength?: number;
+  /** Edge kinds to bundle. Default: all except "containment". */
+  readonly bundleKinds?: readonly string[];
+}
+
+/** @deprecated Use EdgeBundlingOptions. */
+export type BundlingOptions = EdgeBundlingOptions;
+
+/** Configuration for edge aggregation (collapsing duplicate edges). */
+export interface EdgeAggregationOptions {
+  /** Minimum count to trigger aggregation. Default 2 */
+  readonly threshold?: number;
 }
 
 /**
