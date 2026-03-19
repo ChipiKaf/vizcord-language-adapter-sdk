@@ -13,6 +13,13 @@ export type {
   GroupBySpec,
   ViewStyleHints,
   ContainmentDisplay,
+  LayoutPositions,
+  LayoutPostProcessorGraph,
+  LayoutPostProcessor,
+  HubClusterOptions,
+  SiblingStackOptions,
+  CompactOptions,
+  PostProcessorEntry,
 } from "./view-definition.types.js";
 export type {
   ViewDelta,
