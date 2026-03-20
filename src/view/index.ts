@@ -16,12 +16,16 @@ export type {
   LayoutPositions,
   LayoutPostProcessorGraph,
   LayoutPostProcessor,
+  PostProcessorContext,
   HubClusterOptions,
   SiblingStackOptions,
   CompactOptions,
   BundlingOptions,
   EdgeBundlingOptions,
   EdgeAggregationOptions,
+  SideCapacity,
+  SideStackOptions,
+  SideCollapseOptions,
   PostProcessorEntry,
 } from "./view-definition.types.js";
 export type {

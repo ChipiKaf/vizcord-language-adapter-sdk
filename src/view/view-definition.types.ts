@@ -81,14 +81,61 @@ export interface LayoutPostProcessorGraph {
 }
 
 /**
+ * Shared mutable context threaded through the post-processor pipeline.
+ *
+ * Each PP can read data deposited by earlier PPs and write its own
+ * results for downstream consumers.  This avoids re-computing expensive
+ * derived data (hub identification, node dimensions, side assignments)
+ * in every PP.
+ */
+export interface PostProcessorContext {
+  /** Node dimensions extracted from the layout graph (keyed by node id). */
+  nodeDims?: Map<string, { w: number; h: number }>;
+
+  /** In-neighbours per target node, respecting edgeKinds filtering. */
+  inNeighbours?: Map<string, string[]>;
+
+  /**
+   * Identified hub candidates, sorted by descending in-degree.
+   * Written by hubCluster, consumed by sideCollapse / edgeBundling.
+   */
+  hubs?: readonly { centerId: string; neighbours: readonly string[] }[];
+
+  /**
+   * Set of node IDs already "claimed" (placed) by a higher-degree hub.
+   * Written by hubCluster, consumed by sideCollapse.
+   */
+  claimedNodes?: Set<string>;
+
+  /**
+   * Per-hub side assignments produced by hubCluster.
+   * Maps hub centre ID → side → list of neighbour IDs on that side.
+   */
+  hubSideGroups?: Map<
+    string,
+    Map<"top" | "right" | "bottom" | "left", string[]>
+  >;
+
+  /**
+   * Node IDs marked as collapsed by sideCollapse.
+   * Written by sideCollapse, consumed by the scene builder.
+   */
+  collapsedNodes?: ReadonlySet<string>;
+}
+
+/**
  * A function that refines node positions after the primary layout algorithm.
  * Receives the graph description and the current positions; returns adjusted
  * positions. Post-processors are applied in array order — each receives the
  * output of the previous one.
+ *
+ * The optional `context` parameter carries shared mutable state between
+ * PPs in the pipeline.  PPs that don't need context can ignore it.
  */
 export type LayoutPostProcessor = (
   graph: LayoutPostProcessorGraph,
   result: LayoutPositions,
+  context?: PostProcessorContext,
 ) => LayoutPositions;
 
 /** Configuration for the hub-cluster refinement post-processor. */
@@ -139,6 +186,38 @@ export type BundlingOptions = EdgeBundlingOptions;
 export interface EdgeAggregationOptions {
   /** Minimum count to trigger aggregation. Default 2 */
   readonly threshold?: number;
+}
+
+/** Per-side capacity limits for the side-collapse post-processor. */
+export interface SideCapacity {
+  /** Max uncollapsed neighbours on the top side (default 1). */
+  readonly top?: number;
+  /** Max uncollapsed neighbours on the bottom side (default 1). */
+  readonly bottom?: number;
+  /** Max uncollapsed neighbours on the left side (default 2). */
+  readonly left?: number;
+  /** Max uncollapsed neighbours on the right side (default 2). */
+  readonly right?: number;
+}
+
+/** Configuration for the side-stack post-processor. */
+export interface SideStackOptions {
+  /** Minimum incoming edge count for a node to be treated as a hub (default 3). */
+  readonly minFanIn?: number;
+  /** Edge kinds to consider when counting fan-in (all kinds if omitted). */
+  readonly edgeKinds?: readonly string[];
+  /** Vertical gap between stacked nodes on a side (default 10). */
+  readonly stackGap?: number;
+}
+
+/** Configuration for the side-aware collapse post-processor. */
+export interface SideCollapseOptions {
+  /** Minimum incoming edge count for a node to be treated as a hub (default 3). */
+  readonly minFanIn?: number;
+  /** Edge kinds to consider when counting fan-in (all kinds if omitted). */
+  readonly edgeKinds?: readonly string[];
+  /** Max uncollapsed neighbours per side. */
+  readonly maxPerSide?: SideCapacity;
 }
 
 /**
