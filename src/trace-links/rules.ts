@@ -5,18 +5,14 @@ import type { TraceRule, TraceDiagnostic } from "./rules.types.js";
 /**
  * Validate that every canonical node satisfies all applicable trace rules.
  *
- * For each rule, finds all nodes matching `rule.canonicalKind` and checks
- * that at least one trace link with matching `layer` (and `viewType` for
- * view-layer rules) exists for that node.
- *
- * Returns an empty array when all rules are satisfied.
+ * @vizcomment-overview Check that every node has required trace links per its rules
  */
 export function validateTraceRules(
   rules: readonly TraceRule[],
   nodes: readonly CanonicalNode[],
   links: readonly TraceLink[],
 ): TraceDiagnostic[] {
-  // Build link index — view links get both a broad and a viewType-specific key
+  /** @vizcomment-step Build a link index keyed by canonicalId + layer */
   const linkIndex = new Set<string>();
   for (const link of links) {
     if (link.layer === "view") {
@@ -27,7 +23,7 @@ export function validateTraceRules(
     }
   }
 
-  // Pre-group nodes by kind for O(rules × matching-nodes) instead of O(rules × all-nodes)
+  /** @vizcomment-step Group nodes by kind for efficient rule matching */
   const nodesByKind = new Map<CanonicalNodeKind, CanonicalNode[]>();
   for (const node of nodes) {
     let group = nodesByKind.get(node.kind);
@@ -38,6 +34,7 @@ export function validateTraceRules(
     group.push(node);
   }
 
+  /** @vizcomment-step Check each rule against matching nodes */
   const diagnostics: TraceDiagnostic[] = [];
 
   for (const rule of rules) {

@@ -9,10 +9,15 @@ import type {
  */
 export const referentialIntegrity: GraphConstraint = {
   name: "referential-integrity",
+  /**
+   * @vizcomment-overview Verify every edge references existing nodes
+   */
   validate(graph) {
+    /** @vizcomment-step Index all node IDs */
     const nodeIds = new Set<CanonicalId>(graph.nodes.map((n) => n.id));
     const violations: ConstraintViolation[] = [];
 
+    /** @vizcomment-step Check each edge's source and target exist */
     for (const edge of graph.edges) {
       if (!nodeIds.has(edge.sourceId)) {
         violations.push({
@@ -68,12 +73,16 @@ export const uniqueNodeIds: GraphConstraint = {
  */
 export const containmentAcyclicity: GraphConstraint = {
   name: "containment-acyclicity",
+  /**
+   * @vizcomment-overview Detect cycles in the containment tree using DFS
+   */
   validate(graph) {
+    /** @vizcomment-step Filter to containment edges only */
     const containmentEdges = graph.edges.filter(
       (e) => e.kind === "containment",
     );
 
-    // Build adjacency list: child → all parents (handles multi-parent)
+    /** @vizcomment-step Build child-to-parents adjacency list */
     const childToParents = new Map<CanonicalId, CanonicalId[]>();
     for (const edge of containmentEdges) {
       let parents = childToParents.get(edge.targetId);
@@ -88,6 +97,7 @@ export const containmentAcyclicity: GraphConstraint = {
     const finished = new Set<CanonicalId>();
     const reported = new Set<CanonicalId>();
 
+    /** @vizcomment-step Run DFS from each node to detect back edges */
     function dfs(nodeId: CanonicalId, stack: Set<CanonicalId>): void {
       if (finished.has(nodeId)) return;
       if (stack.has(nodeId)) {

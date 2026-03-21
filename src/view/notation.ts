@@ -134,7 +134,11 @@ export const defaultNotation: NotationStandard = {
   },
 };
 
-/** Validate that a notation standard covers all canonical kinds. */
+/**
+ * Validate that a notation standard covers all canonical kinds.
+ *
+ * @vizcomment-overview Verify notation covers every canonical node and edge kind
+ */
 export function validateNotation(
   notation: NotationStandard,
 ): readonly string[] {

@@ -6,6 +6,8 @@ import type { ExpectedGraph } from "./conformance.types.js";
 /**
  * Assert that an actual CanonicalGraph matches the expected shape.
  * Ignores IDs; matches by kind+name for nodes, kind+source+target for edges.
+ *
+ * @vizcomment-overview Assert graph shape matches expected nodes and edges
  */
 export function assertGraphShape(
   actual: CanonicalGraph,
@@ -13,7 +15,7 @@ export function assertGraphShape(
 ): void {
   const actualNonModule = actual.nodes.filter((n) => n.kind !== "module");
 
-  // Check expected node counts by kind+name
+  /** @vizcomment-step Count expected and actual nodes by kind+name */
   const expectedCounts = new Map<string, number>();
   for (const en of expected.nodes) {
     const key = `${en.kind}:${en.name}`;
@@ -33,7 +35,7 @@ export function assertGraphShape(
     ).toBe(count);
   }
 
-  // Check visibility/completeness on uniquely-named nodes
+  /** @vizcomment-step Verify visibility and completeness on unique nodes */
   for (const en of expected.nodes) {
     if (en.visibility === undefined && en.completeness === undefined) continue;
     const matches = actualNonModule.filter(
@@ -71,7 +73,7 @@ export function assertGraphShape(
         .join(", ")}]`,
   ).toBe(expected.nodes.length);
 
-  // Check edges — only assert edges whose source and target names are unique
+  /** @vizcomment-step Match edges by kind, source name, and target name */
   for (const ee of expected.edges) {
     const sourceNodes = actual.nodes.filter((n) => n.name === ee.sourceName);
     const targetNodes = actual.nodes.filter((n) => n.name === ee.targetName);
@@ -136,8 +138,11 @@ export function assertTraceLinkCoverage(
 /**
  * Normalize a graph to a comparable shape (sorted by kind+name, IDs stripped).
  * Used for cross-adapter equivalence comparisons.
+ *
+ * @vizcomment-overview Strip IDs and sort nodes/edges for cross-adapter comparison
  */
 export function normalizeGraphShape(graph: CanonicalGraph) {
+  /** @vizcomment-step Normalize nodes to kind+name pairs, sorted */
   const nodes = graph.nodes
     .filter((n) => n.kind !== "module")
     .map((n) => ({ kind: n.kind, name: n.name }))
@@ -145,6 +150,7 @@ export function normalizeGraphShape(graph: CanonicalGraph) {
       (a, b) => a.kind.localeCompare(b.kind) || a.name.localeCompare(b.name),
     );
 
+  /** @vizcomment-step Normalize edges to kind+sourceName+targetName, sorted */
   const edges = graph.edges
     .map((e) => {
       const src = graph.nodes.find((n) => n.id === e.sourceId);

@@ -29,8 +29,12 @@ export const maxVisibleNodes: ViewConstraint = {
 /** No two nodes may visually overlap after layout. */
 export const noNodeOverlap: ViewConstraint = {
   name: "no-node-overlap",
+  /**
+   * @vizcomment-overview Detect pairwise node overlaps in the layout
+   */
   validate(_viewModel, layout) {
     const violations: ViewConstraintViolation[] = [];
+    /** @vizcomment-step Compare all node position pairs for overlap */
     const entries = [...layout.nodePositions.entries()];
 
     for (let i = 0; i < entries.length; i++) {
@@ -105,7 +109,11 @@ export const maxNodeDegree: ViewConstraint = {
 /** Area coverage should be between 30–85% (not too sparse, not too dense). */
 export const areaCoverage: ViewConstraint = {
   name: "area-coverage",
+  /**
+   * @vizcomment-overview Check that diagram density is within readable bounds
+   */
   validate(_viewModel, layout) {
+    /** @vizcomment-step Compute total area and node area sum */
     const totalArea = layout.totalWidth * layout.totalHeight;
     if (totalArea === 0) return [];
 
@@ -116,6 +124,7 @@ export const areaCoverage: ViewConstraint = {
     const coverage = nodeArea / totalArea;
     const violations: ViewConstraintViolation[] = [];
 
+    /** @vizcomment-step Report sparse or dense coverage violations */
     if (coverage < 0.3) {
       violations.push({
         constraintName: "area-coverage",
@@ -185,6 +194,8 @@ function onSegment(a: EdgePath, b: EdgePath, c: EdgePath): boolean {
 
 /**
  * Count segment-segment crossings across all edge paths.
+ *
+ * @vizcomment-overview Count visual edge crossings for readability analysis
  */
 export function countEdgeCrossings(
   edgePaths: ReadonlyMap<string, readonly EdgePath[]>,

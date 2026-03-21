@@ -6,6 +6,8 @@ import type { LoadedFixture } from "./runner.js";
 /**
  * Load conformance fixtures from a directory.
  *
+ * @vizcomment-overview Load test fixture files from a directory structure
+ *
  * Expects a layout like:
  * ```
  * fixturesDir/
@@ -29,9 +31,11 @@ export function loadFixturesFromDir(
   inputFileName = "input.ts",
   virtualPath = "src/input.ts",
 ): LoadedFixture[] {
+  /** @vizcomment-step Enumerate fixture subdirectories */
   const entries = readdirSync(fixturesDir, { withFileTypes: true });
   const fixtures: LoadedFixture[] = [];
 
+  /** @vizcomment-step Read input and expected-graph files for each fixture */
   for (const entry of entries) {
     if (!entry.isDirectory()) continue;
 
