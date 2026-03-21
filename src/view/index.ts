@@ -61,3 +61,19 @@ export {
   countEdgeCrossings,
 } from "./view-constraints.js";
 export { ViewValidator } from "./view-validator.js";
+export type {
+  PhilosophyRule,
+  EnforcementMechanism,
+  RuleCategory,
+  RuleStatus,
+  CategoryMeta,
+} from "./philosophy-spec.types.js";
+export {
+  PHILOSOPHY_RULES,
+  getRuleById,
+  getRulesByCategory,
+  getRulesByStatus,
+  generateSpecMarkdown,
+  parseSpecMarkdown,
+} from "./philosophy-spec.js";
+export type { ParsedMarkdownRule } from "./philosophy-spec.js";
