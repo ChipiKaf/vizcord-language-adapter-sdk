@@ -52,7 +52,17 @@ export interface PackageNode extends CanonicalNodeBase {
 
 export interface ModuleNode extends CanonicalNodeBase {
   readonly kind: "module";
-  /** Enclosing package id */
+  /** Enclosing package id
+   * @Todo - Record the parent package for a module,
+   * if applicable.
+   * This allows us to reconstruct package → module
+   * containment edges in the hub,
+   * which is important for languages
+   * like Java where packages
+   * are a core part of the
+   * structure. We can make this
+   * optional for languages where the concept of a package is less formalized.
+   */
   readonly packageId?: CanonicalId;
 }
 
